@@ -1,28 +1,41 @@
 import { RefreshCw, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { listCases, updateCaseStage, updateCaseStatus } from "../api/casesApi.js";
+import { listCases } from "../api/casesApi.js";
+import { listClients } from "../api/clientsApi.js";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
+import { getCaseClientName, getCaseNumber } from "../utils/display.js";
 
 const STAGE_OPTIONS = ["intake", "document_collection", "review", "filed", "decision"];
 const STATUS_OPTIONS = ["open", "pending", "closed"];
 
 export function CasesPage() {
   const [cases, setCases] = useState([]);
+  const [clientLookup, setClientLookup] = useState({});
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total_pages: 1, total_items: 0 });
   const [filters, setFilters] = useState({ case_status: "", case_stage: "", case_type: "", client_id: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
 
   async function loadCases(page = pagination.page) {
     setIsLoading(true);
     setError("");
 
     try {
-      const data = await listCases({ ...filters, page, limit: pagination.limit });
+      const [data, clientsResult] = await Promise.all([
+        listCases({ ...filters, page, limit: pagination.limit }),
+        listClients(),
+      ]);
+      const clients = Array.isArray(clientsResult) ? clientsResult : clientsResult.items || [];
+
+      setClientLookup(
+        clients.reduce((lookup, client) => {
+          lookup[client.client_id] = client;
+          return lookup;
+        }, {}),
+      );
       setCases(data.items || []);
       setPagination(data.pagination || { page, limit: pagination.limit, total_pages: 1, total_items: 0 });
     } catch (err) {
@@ -41,32 +54,6 @@ export function CasesPage() {
     await loadCases(1);
   }
 
-  async function handleStageChange(caseId, value) {
-    setUpdatingId(caseId);
-    setError("");
-    try {
-      await updateCaseStage(caseId, value);
-      await loadCases(pagination.page);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUpdatingId(null);
-    }
-  }
-
-  async function handleStatusChange(caseId, value) {
-    setUpdatingId(caseId);
-    setError("");
-    try {
-      await updateCaseStatus(caseId, value);
-      await loadCases(pagination.page);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUpdatingId(null);
-    }
-  }
-
   function updateFilter(name, value) {
     setFilters((current) => ({ ...current, [name]: value }));
   }
@@ -76,7 +63,7 @@ export function CasesPage() {
       <PageHeader
         eyebrow="Case management"
         title="Cases"
-        description="Browse active matters, filter the queue, and send workflow-specific updates to the API."
+        description="Browse active matters and open a case to manage workflow details."
         actions={
           <button className="secondary-button" onClick={() => loadCases(pagination.page)} type="button">
             <RefreshCw size={16} />
@@ -126,7 +113,7 @@ export function CasesPage() {
 
       <section className="content-section">
         <div className="section-heading">
-          <h2>Case queue</h2>
+          <h2>Case list</h2>
           <span>{pagination.total_items || 0} total</span>
         </div>
 
@@ -150,43 +137,18 @@ export function CasesPage() {
               <tbody>
                 {cases.map((caseItem) => (
                   <tr key={caseItem.case_id}>
-                    <td>{caseItem.case_title || `Case #${caseItem.case_id}`}</td>
-                    <td>{caseItem.client_name || caseItem.client?.client_name || "Unassigned"}</td>
+                    <td>{getCaseNumber(caseItem)}</td>
+                    <td>{getCaseClientName(caseItem, clientLookup)}</td>
                     <td>{caseItem.case_type || "Unassigned"}</td>
+                    <td>{caseItem.case_stage || "intake"}</td>
                     <td>
-                      <select
-                        disabled={updatingId === caseItem.case_id}
-                        value={caseItem.case_stage || ""}
-                        onChange={(event) => handleStageChange(caseItem.case_id, event.target.value)}
-                      >
-                        <option value="">Select stage</option>
-                        {STAGE_OPTIONS.map((stage) => (
-                          <option key={stage} value={stage}>
-                            {stage}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <select
-                        disabled={updatingId === caseItem.case_id}
-                        value={caseItem.case_status || ""}
-                        onChange={(event) => handleStatusChange(caseItem.case_id, event.target.value)}
-                      >
-                        <option value="">Select status</option>
-                        {STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
                       <StatusBadge tone={caseItem.case_status === "closed" ? "success" : "warning"}>
                         {caseItem.case_status || "open"}
                       </StatusBadge>
                     </td>
                     <td>
                       <Link className="text-link" to={`/cases/${caseItem.case_id}`}>
-                        Open
+                        Go to case
                       </Link>
                     </td>
                   </tr>

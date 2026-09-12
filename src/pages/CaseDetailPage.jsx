@@ -10,10 +10,12 @@ import {
   updateCaseStatus,
   updateCaseType,
 } from "../api/casesApi.js";
+import { getClient } from "../api/clientsApi.js";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
+import { getCaseClientId, getCaseClientName, getCaseNumber } from "../utils/display.js";
 
 const STAGE_OPTIONS = ["intake", "document_collection", "review", "filed", "decision"];
 const STATUS_OPTIONS = ["open", "pending", "closed"];
@@ -23,6 +25,7 @@ export function CaseDetailPage() {
   const { caseId } = useParams();
   const { isAdmin } = useAuth();
   const [caseItem, setCaseItem] = useState(null);
+  const [client, setClient] = useState(null);
   const [workflow, setWorkflow] = useState({ case_stage: "", case_status: "", case_type: "" });
   const [assignedUserIds, setAssignedUserIds] = useState("");
   const [assignedAction, setAssignedAction] = useState("add");
@@ -41,13 +44,25 @@ export function CaseDetailPage() {
 
     try {
       const data = await getCase(caseId);
+      const clientId = getCaseClientId(data);
+
       setCaseItem(data);
+      setClient(null);
       setWorkflow({
         case_stage: data.case_stage || "",
         case_status: data.case_status || "",
         case_type: data.case_type || "",
       });
-      setClientIdInput(String(data.client_id || data.client?.client_id || ""));
+      setClientIdInput(String(clientId || ""));
+
+      if (clientId) {
+        try {
+          const clientData = await getClient(clientId);
+          setClient(clientData);
+        } catch {
+          setClient(null);
+        }
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -130,7 +145,7 @@ export function CaseDetailPage() {
     <>
       <PageHeader
         eyebrow="Case detail"
-        title={caseItem?.case_title || `Case #${caseId}`}
+        title={caseItem ? getCaseNumber(caseItem) : `#${caseId}`}
         description="Review the selected case record returned by the API."
         actions={
           <>
@@ -182,11 +197,7 @@ export function CaseDetailPage() {
               <dl>
                 <div>
                   <dt>Name</dt>
-                  <dd>{caseItem.client_name || caseItem.client?.client_name || "Unassigned"}</dd>
-                </div>
-                <div>
-                  <dt>Client ID</dt>
-                  <dd>{caseItem.client_id || caseItem.client?.client_id || "None"}</dd>
+                  <dd>{getCaseClientName(caseItem, client ? { [client.client_id]: client } : {})}</dd>
                 </div>
               </dl>
             </article>

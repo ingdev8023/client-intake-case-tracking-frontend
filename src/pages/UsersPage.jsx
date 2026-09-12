@@ -4,6 +4,7 @@ import { activateUser, createUser, deactivateUser, listUsers } from "../api/user
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
+import { getUserIsActive } from "../utils/display.js";
 
 export function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -57,11 +58,13 @@ export function UsersPage() {
   }
 
   async function handleUserStatus(user) {
+    const isActive = getUserIsActive(user);
+
     setUpdatingUserId(user.user_id);
     setError("");
 
     try {
-      if (user.is_active) {
+      if (isActive) {
         await deactivateUser(user.user_id);
       } else {
         await activateUser(user.user_id);
@@ -151,28 +154,32 @@ export function UsersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.user_id}>
-                      <td>{user.user_name || `User #${user.user_id}`}</td>
-                      <td>{user.user_email}</td>
-                      <td>{user.user_role}</td>
-                      <td>
-                        <StatusBadge tone={user.is_active ? "success" : "neutral"}>
-                          {user.is_active ? "active" : "inactive"}
-                        </StatusBadge>
-                      </td>
-                      <td>
-                        <button
-                          className="secondary-button"
-                          disabled={updatingUserId === user.user_id}
-                          onClick={() => handleUserStatus(user)}
-                          type="button"
-                        >
-                          {user.is_active ? "Deactivate" : "Activate"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {users.map((user) => {
+                    const isActive = getUserIsActive(user);
+
+                    return (
+                      <tr key={user.user_id}>
+                        <td>{user.user_name || `User #${user.user_id}`}</td>
+                        <td>{user.user_email}</td>
+                        <td>{user.user_role}</td>
+                        <td>
+                          <StatusBadge tone={isActive ? "success" : "neutral"}>
+                            {isActive ? "active" : "inactive"}
+                          </StatusBadge>
+                        </td>
+                        <td>
+                          <button
+                            className="secondary-button"
+                            disabled={updatingUserId === user.user_id}
+                            onClick={() => handleUserStatus(user)}
+                            type="button"
+                          >
+                            {isActive ? "Deactivate" : "Activate"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

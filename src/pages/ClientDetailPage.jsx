@@ -4,6 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import { getClient, updateClient } from "../api/clientsApi.js";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
+import {
+  getClientAddress,
+  getClientDateOfBirth,
+  getClientEmail,
+  getClientFirstName,
+  getClientFullName,
+  getClientLastName,
+  getClientPhone,
+} from "../utils/display.js";
 
 export function ClientDetailPage() {
   const { clientId } = useParams();
@@ -23,11 +32,12 @@ export function ClientDetailPage() {
       const data = await getClient(clientId);
       setClient(data);
       setForm({
-        client_name: data.client_name || "",
-        client_email: data.client_email || "",
-        client_phone: data.client_phone || "",
-        client_address: data.client_address || "",
-        client_date_of_birth: data.client_date_of_birth || "",
+        client_first_name: getClientFirstName(data),
+        client_last_name: getClientLastName(data),
+        client_email: getClientEmail(data),
+        client_phone: getClientPhone(data),
+        client_address: getClientAddress(data),
+        client_date_of_birth: getClientDateOfBirth(data),
       });
     } catch (err) {
       setError(err.message);
@@ -65,7 +75,7 @@ export function ClientDetailPage() {
     <>
       <PageHeader
         eyebrow="Client detail"
-        title={client?.client_name || `Client #${clientId}`}
+        title={getClientFullName(client) || `Client #${clientId}`}
         description="Review and update the selected client profile from the API."
         actions={
           <Link className="secondary-button" to="/clients">
@@ -83,11 +93,19 @@ export function ClientDetailPage() {
         <form className="form-panel detail-form" onSubmit={handleSubmit}>
           <h2>Profile</h2>
           <label>
-            <span>Name</span>
+            <span>First name</span>
             <input
               required
-              value={form.client_name}
-              onChange={(event) => updateField("client_name", event.target.value)}
+              value={form.client_first_name}
+              onChange={(event) => updateField("client_first_name", event.target.value)}
+            />
+          </label>
+          <label>
+            <span>Last name</span>
+            <input
+              required
+              value={form.client_last_name}
+              onChange={(event) => updateField("client_last_name", event.target.value)}
             />
           </label>
           <label>

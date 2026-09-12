@@ -500,7 +500,8 @@ td select {
 
 .workflow-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
   gap: 14px;
   padding: 18px;
 }
@@ -514,6 +515,11 @@ td select {
   border-radius: 8px;
   padding: 14px;
   background: #fbfcfd;
+}
+
+.inline-workflow-form input,
+.inline-workflow-form select {
+  max-width: 420px;
 }
 
 .inline-workflow-form label:nth-child(2) {

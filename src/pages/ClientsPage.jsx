@@ -4,10 +4,17 @@ import { Link } from "react-router-dom";
 import { createClient, listClients } from "../api/clientsApi.js";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
+import { getClientAddress, getClientEmail, getClientFullName, getClientPhone } from "../utils/display.js";
 
 export function ClientsPage() {
   const [clients, setClients] = useState([]);
-  const [form, setForm] = useState({ client_name: "", client_email: "", client_phone: "" });
+  const [form, setForm] = useState({
+    client_first_name: "",
+    client_last_name: "",
+    client_email: "",
+    client_phone: "",
+    client_address: "",
+  });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +44,13 @@ export function ClientsPage() {
 
     try {
       await createClient(form);
-      setForm({ client_name: "", client_email: "", client_phone: "" });
+      setForm({
+        client_first_name: "",
+        client_last_name: "",
+        client_email: "",
+        client_phone: "",
+        client_address: "",
+      });
       await loadClients();
     } catch (err) {
       setError(err.message);
@@ -70,11 +83,19 @@ export function ClientsPage() {
         <form className="form-panel" onSubmit={handleSubmit}>
           <h2>New client</h2>
           <label>
-            <span>Name</span>
+            <span>First name</span>
             <input
               required
-              value={form.client_name}
-              onChange={(event) => updateField("client_name", event.target.value)}
+              value={form.client_first_name}
+              onChange={(event) => updateField("client_first_name", event.target.value)}
+            />
+          </label>
+          <label>
+            <span>Last name</span>
+            <input
+              required
+              value={form.client_last_name}
+              onChange={(event) => updateField("client_last_name", event.target.value)}
             />
           </label>
           <label>
@@ -88,6 +109,13 @@ export function ClientsPage() {
           <label>
             <span>Phone</span>
             <input value={form.client_phone} onChange={(event) => updateField("client_phone", event.target.value)} />
+          </label>
+          <label>
+            <span>Address</span>
+            <input
+              value={form.client_address}
+              onChange={(event) => updateField("client_address", event.target.value)}
+            />
           </label>
           <button className="primary-button" disabled={isSubmitting} type="submit">
             <Plus size={16} />
@@ -113,18 +141,20 @@ export function ClientsPage() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Address</th>
                     <th>Detail</th>
                   </tr>
                 </thead>
                 <tbody>
                   {clients.map((client) => (
                     <tr key={client.client_id}>
-                      <td>{client.client_name || `Client #${client.client_id}`}</td>
-                      <td>{client.client_email || "None"}</td>
-                      <td>{client.client_phone || "None"}</td>
+                      <td>{getClientFullName(client) || `Client #${client.client_id}`}</td>
+                      <td>{getClientEmail(client) || "None"}</td>
+                      <td>{getClientPhone(client) || "None"}</td>
+                      <td>{getClientAddress(client) || "None"}</td>
                       <td>
                         <Link className="text-link" to={`/clients/${client.client_id}`}>
-                          Open
+                          Go to client
                         </Link>
                       </td>
                     </tr>
