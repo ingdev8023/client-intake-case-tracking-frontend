@@ -8,6 +8,7 @@ import { AppLayout } from "./components/AppLayout.jsx";
 import { LoginPage } from "./pages/LoginPage.jsx";
 import { DashboardPage } from "./pages/DashboardPage.jsx";
 import { CasesPage } from "./pages/CasesPage.jsx";
+import { NewCasePage } from "./pages/NewCasePage.jsx";
 import { CaseDetailPage } from "./pages/CaseDetailPage.jsx";
 import { ClientsPage } from "./pages/ClientsPage.jsx";
 import { ClientDetailPage } from "./pages/ClientDetailPage.jsx";
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <DashboardPage /> },
       { path: "cases", element: <CasesPage /> },
+      { path: "cases/new", element: <NewCasePage /> },
       { path: "cases/:caseId", element: <CaseDetailPage /> },
       { path: "clients", element: <ClientsPage /> },
       { path: "clients/:clientId", element: <ClientDetailPage /> },

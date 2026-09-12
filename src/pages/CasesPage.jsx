@@ -1,4 +1,4 @@
-import { RefreshCw, Search } from "lucide-react";
+import { Plus, RefreshCw, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listCases } from "../api/casesApi.js";
@@ -65,10 +65,16 @@ export function CasesPage() {
         title="Cases"
         description="Browse active matters and open a case to manage workflow details."
         actions={
-          <button className="secondary-button" onClick={() => loadCases(pagination.page)} type="button">
-            <RefreshCw size={16} />
-            Refresh
-          </button>
+          <>
+            <Link className="primary-button" to="/cases/new">
+              <Plus size={16} />
+              Add case
+            </Link>
+            <button className="secondary-button" onClick={() => loadCases(pagination.page)} type="button">
+              <RefreshCw size={16} />
+              Refresh
+            </button>
+          </>
         }
       />
 

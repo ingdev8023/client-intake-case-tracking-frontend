@@ -3,11 +3,11 @@ function firstDefined(record, keys) {
 }
 
 export function getClientFirstName(client) {
-  return firstDefined(client, ["client_first_name", "first_name", "clientFirstName", "firstName"]) || "";
+  return firstDefined(client, ["client_firstname", "client_first_name", "first_name", "clientFirstName", "firstName"]) || "";
 }
 
 export function getClientLastName(client) {
-  return firstDefined(client, ["client_last_name", "last_name", "clientLastName", "lastName"]) || "";
+  return firstDefined(client, ["client_lastname", "client_last_name", "last_name", "clientLastName", "lastName"]) || "";
 }
 
 export function getClientFullName(client) {
@@ -39,17 +39,12 @@ export function getCaseClientId(caseItem) {
 }
 
 export function getCaseClientName(caseItem, clientLookup = {}) {
-  const directName =
-    firstDefined(caseItem, ["client_name", "client_full_name"]) ||
-    getClientFullName(caseItem?.client) ||
-    "";
-
-  if (directName) {
-    return directName;
-  }
-
   const clientId = getCaseClientId(caseItem);
-  return getClientFullName(clientLookup[clientId]) || "Unassigned";
+  const lookupName = getClientFullName(clientLookup[clientId]);
+  const nestedName = getClientFullName(caseItem?.client);
+  const directName = firstDefined(caseItem, ["client_full_name", "client_name"]) || "";
+
+  return lookupName || nestedName || directName || "Unassigned";
 }
 
 export function getCaseNumber(caseItem) {

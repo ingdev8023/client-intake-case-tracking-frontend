@@ -32,8 +32,8 @@ export function ClientDetailPage() {
       const data = await getClient(clientId);
       setClient(data);
       setForm({
-        client_first_name: getClientFirstName(data),
-        client_last_name: getClientLastName(data),
+        client_firstname: getClientFirstName(data),
+        client_lastname: getClientLastName(data),
         client_email: getClientEmail(data),
         client_phone: getClientPhone(data),
         client_address: getClientAddress(data),
@@ -96,16 +96,16 @@ export function ClientDetailPage() {
             <span>First name</span>
             <input
               required
-              value={form.client_first_name}
-              onChange={(event) => updateField("client_first_name", event.target.value)}
+              value={form.client_firstname}
+              onChange={(event) => updateField("client_firstname", event.target.value)}
             />
           </label>
           <label>
             <span>Last name</span>
             <input
               required
-              value={form.client_last_name}
-              onChange={(event) => updateField("client_last_name", event.target.value)}
+              value={form.client_lastname}
+              onChange={(event) => updateField("client_lastname", event.target.value)}
             />
           </label>
           <label>

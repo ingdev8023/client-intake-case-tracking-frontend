@@ -15,7 +15,15 @@ import { useAuth } from "../auth/AuthProvider.jsx";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
-import { getCaseClientId, getCaseClientName, getCaseNumber } from "../utils/display.js";
+import {
+  getCaseClientId,
+  getCaseClientName,
+  getCaseNumber,
+  getClientAddress,
+  getClientDateOfBirth,
+  getClientEmail,
+  getClientPhone,
+} from "../utils/display.js";
 
 const STAGE_OPTIONS = ["intake", "document_collection", "review", "filed", "decision"];
 const STATUS_OPTIONS = ["open", "pending", "closed"];
@@ -35,6 +43,7 @@ export function CaseDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   async function loadCase({ quiet = false } = {}) {
     if (!quiet) {
@@ -84,6 +93,7 @@ export function CaseDetailPage() {
     } catch (err) {
       setError(err.message);
       setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   }
 
@@ -154,9 +164,14 @@ export function CaseDetailPage() {
               Cases
             </Link>
             {isAdmin && (
-              <button className="danger-button" disabled={isDeleting} onClick={handleDelete} type="button">
+              <button
+                className="danger-button"
+                disabled={isDeleting}
+                onClick={() => setIsDeleteModalOpen(true)}
+                type="button"
+              >
                 <Trash2 size={16} />
-                {isDeleting ? "Deleting..." : "Delete"}
+                Delete
               </button>
             )}
           </>
@@ -196,8 +211,24 @@ export function CaseDetailPage() {
               <h2>Client</h2>
               <dl>
                 <div>
-                  <dt>Name</dt>
+                  <dt>Complete name</dt>
                   <dd>{getCaseClientName(caseItem, client ? { [client.client_id]: client } : {})}</dd>
+                </div>
+                <div>
+                  <dt>Email</dt>
+                  <dd>{getClientEmail(client) || "None"}</dd>
+                </div>
+                <div>
+                  <dt>Phone</dt>
+                  <dd>{getClientPhone(client) || "None"}</dd>
+                </div>
+                <div>
+                  <dt>Address</dt>
+                  <dd>{getClientAddress(client) || "None"}</dd>
+                </div>
+                <div>
+                  <dt>DOB</dt>
+                  <dd>{getClientDateOfBirth(client) || "None"}</dd>
                 </div>
               </dl>
             </article>
@@ -319,6 +350,30 @@ export function CaseDetailPage() {
             </div>
           </section>
         </>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="modal-backdrop" role="presentation">
+          <section className="modal-panel" aria-labelledby="delete-case-title" role="dialog" aria-modal="true">
+            <div className="modal-icon">
+              <Trash2 size={22} />
+            </div>
+            <h2 id="delete-case-title">Delete this case?</h2>
+            <p>
+              This is a dangerous action. Deleting a case can hide it from normal workflows and may affect audit history
+              or reporting. Only continue if you are sure this case should be removed.
+            </p>
+            <div className="modal-actions">
+              <button className="secondary-button" disabled={isDeleting} onClick={() => setIsDeleteModalOpen(false)} type="button">
+                Cancel
+              </button>
+              <button className="danger-button" disabled={isDeleting} onClick={handleDelete} type="button">
+                <Trash2 size={16} />
+                {isDeleting ? "Deleting..." : "Delete case"}
+              </button>
+            </div>
+          </section>
+        </div>
       )}
     </>
   );

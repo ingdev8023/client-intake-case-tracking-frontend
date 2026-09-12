@@ -9,8 +9,8 @@ import { getClientAddress, getClientEmail, getClientFullName, getClientPhone } f
 export function ClientsPage() {
   const [clients, setClients] = useState([]);
   const [form, setForm] = useState({
-    client_first_name: "",
-    client_last_name: "",
+    client_firstname: "",
+    client_lastname: "",
     client_email: "",
     client_phone: "",
     client_address: "",
@@ -45,8 +45,8 @@ export function ClientsPage() {
     try {
       await createClient(form);
       setForm({
-        client_first_name: "",
-        client_last_name: "",
+        client_firstname: "",
+        client_lastname: "",
         client_email: "",
         client_phone: "",
         client_address: "",
@@ -86,16 +86,16 @@ export function ClientsPage() {
             <span>First name</span>
             <input
               required
-              value={form.client_first_name}
-              onChange={(event) => updateField("client_first_name", event.target.value)}
+              value={form.client_firstname}
+              onChange={(event) => updateField("client_firstname", event.target.value)}
             />
           </label>
           <label>
             <span>Last name</span>
             <input
               required
-              value={form.client_last_name}
-              onChange={(event) => updateField("client_last_name", event.target.value)}
+              value={form.client_lastname}
+              onChange={(event) => updateField("client_lastname", event.target.value)}
             />
           </label>
           <label>
