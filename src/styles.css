@@ -141,6 +141,37 @@ select {
   padding: 8px 12px;
 }
 
+.checkbox-list {
+  display: grid;
+  gap: 8px;
+  min-height: 88px;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #cfd8df;
+  border-radius: 6px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.checkbox-row {
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+  font-weight: 700;
+}
+
+.checkbox-row input {
+  width: 16px;
+  min-height: 16px;
+}
+
+.muted-text {
+  color: #66737d;
+  font-size: 0.9rem;
+}
+
 input:focus,
 select:focus {
   border-color: #246a83;

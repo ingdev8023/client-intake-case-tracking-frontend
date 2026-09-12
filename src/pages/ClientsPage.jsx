@@ -4,7 +4,13 @@ import { Link } from "react-router-dom";
 import { createClient, listClients } from "../api/clientsApi.js";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
-import { getClientAddress, getClientEmail, getClientFullName, getClientPhone } from "../utils/display.js";
+import {
+  getClientAddress,
+  getClientDateOfBirth,
+  getClientEmail,
+  getClientFullName,
+  getClientPhone,
+} from "../utils/display.js";
 
 export function ClientsPage() {
   const [clients, setClients] = useState([]);
@@ -14,6 +20,7 @@ export function ClientsPage() {
     client_email: "",
     client_phone: "",
     client_address: "",
+    client_date_of_birth: "",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -50,6 +57,7 @@ export function ClientsPage() {
         client_email: "",
         client_phone: "",
         client_address: "",
+        client_date_of_birth: "",
       });
       await loadClients();
     } catch (err) {
@@ -117,6 +125,15 @@ export function ClientsPage() {
               onChange={(event) => updateField("client_address", event.target.value)}
             />
           </label>
+          <label>
+            <span>Date of birth</span>
+            <input
+              required
+              type="date"
+              value={form.client_date_of_birth}
+              onChange={(event) => updateField("client_date_of_birth", event.target.value)}
+            />
+          </label>
           <button className="primary-button" disabled={isSubmitting} type="submit">
             <Plus size={16} />
             {isSubmitting ? "Creating..." : "Create client"}
@@ -142,6 +159,7 @@ export function ClientsPage() {
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Address</th>
+                    <th>DOB</th>
                     <th>Detail</th>
                   </tr>
                 </thead>
@@ -152,6 +170,7 @@ export function ClientsPage() {
                       <td>{getClientEmail(client) || "None"}</td>
                       <td>{getClientPhone(client) || "None"}</td>
                       <td>{getClientAddress(client) || "None"}</td>
+                      <td>{getClientDateOfBirth(client) || "None"}</td>
                       <td>
                         <Link className="text-link" to={`/clients/${client.client_id}`}>
                           Go to client

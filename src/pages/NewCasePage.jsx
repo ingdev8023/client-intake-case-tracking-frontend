@@ -48,8 +48,15 @@ export function NewCasePage() {
   }
 
   function updateAssignedUsers(event) {
-    const selectedIds = Array.from(event.target.selectedOptions, (option) => option.value);
-    updateField("assigned_user_ids", selectedIds);
+    const userId = event.target.value;
+
+    setForm((current) => {
+      const assignedUserIds = current.assigned_user_ids.includes(userId)
+        ? current.assigned_user_ids.filter((id) => id !== userId)
+        : [...current.assigned_user_ids, userId];
+
+      return { ...current, assigned_user_ids: assignedUserIds };
+    });
   }
 
   async function handleSubmit(event) {
@@ -149,20 +156,29 @@ export function NewCasePage() {
         </label>
         <label>
           <span>Assigned users</span>
-          <select
-            className="multi-select"
-            disabled={isLoadingLookups}
-            multiple
-            required
-            value={form.assigned_user_ids}
-            onChange={updateAssignedUsers}
-          >
-            {users.map((user) => (
-              <option key={getUserId(user)} value={getUserId(user)}>
-                {getUserDisplayName(user)}
-              </option>
-            ))}
-          </select>
+          <div className="checkbox-list">
+            {isLoadingLookups ? (
+              <span className="muted-text">Loading users...</span>
+            ) : users.length === 0 ? (
+              <span className="muted-text">No users available</span>
+            ) : (
+              users.map((user) => {
+                const userId = String(getUserId(user));
+
+                return (
+                  <label className="checkbox-row" key={userId}>
+                    <input
+                      checked={form.assigned_user_ids.includes(userId)}
+                      onChange={updateAssignedUsers}
+                      type="checkbox"
+                      value={userId}
+                    />
+                    <span>{getUserDisplayName(user)}</span>
+                  </label>
+                );
+              })
+            )}
+          </div>
         </label>
         <button className="primary-button" disabled={isSubmitting || isLoadingLookups} type="submit">
           <Plus size={16} />
