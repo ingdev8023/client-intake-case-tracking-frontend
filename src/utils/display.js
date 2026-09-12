@@ -34,6 +34,10 @@ export function getClientDateOfBirth(client) {
   return firstDefined(client, ["client_date_of_birth", "date_of_birth", "dob"]) || "";
 }
 
+export function getClientId(client) {
+  return firstDefined(client, ["client_id", "id"]) || "";
+}
+
 export function getCaseClientId(caseItem) {
   return firstDefined(caseItem, ["client_id"]) || caseItem?.client?.client_id || "";
 }
@@ -68,4 +72,12 @@ export function getUserIsActive(user) {
   }
 
   return true;
+}
+
+export function getUserId(user) {
+  return firstDefined(user, ["user_id", "id"]) || "";
+}
+
+export function getUserDisplayName(user) {
+  return firstDefined(user, ["user_name", "name", "full_name", "user_full_name"]) || user?.user_email || `User #${getUserId(user)}`;
 }

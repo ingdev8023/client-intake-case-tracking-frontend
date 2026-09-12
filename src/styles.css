@@ -136,6 +136,11 @@ select {
   background: #ffffff;
 }
 
+.multi-select {
+  min-height: 116px;
+  padding: 8px 12px;
+}
+
 input:focus,
 select:focus {
   border-color: #246a83;

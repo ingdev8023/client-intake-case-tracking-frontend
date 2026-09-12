@@ -32,7 +32,7 @@ export function ClientDetailPage() {
       const data = await getClient(clientId);
       setClient(data);
       setForm({
-        client_firstname: getClientFirstName(data),
+        client_first_name: getClientFirstName(data),
         client_lastname: getClientLastName(data),
         client_email: getClientEmail(data),
         client_phone: getClientPhone(data),
@@ -96,8 +96,8 @@ export function ClientDetailPage() {
             <span>First name</span>
             <input
               required
-              value={form.client_firstname}
-              onChange={(event) => updateField("client_firstname", event.target.value)}
+              value={form.client_first_name}
+              onChange={(event) => updateField("client_first_name", event.target.value)}
             />
           </label>
           <label>

@@ -10,7 +10,8 @@ import {
   updateCaseStatus,
   updateCaseType,
 } from "../api/casesApi.js";
-import { getClient } from "../api/clientsApi.js";
+import { getClient, listClients } from "../api/clientsApi.js";
+import { listUsers } from "../api/usersApi.js";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
@@ -22,11 +23,13 @@ import {
   getClientAddress,
   getClientDateOfBirth,
   getClientEmail,
+  getClientFullName,
+  getClientId,
   getClientPhone,
+  getUserDisplayName,
+  getUserId,
 } from "../utils/display.js";
-
-const STAGE_OPTIONS = ["intake", "document_collection", "review", "filed", "decision"];
-const STATUS_OPTIONS = ["open", "pending", "closed"];
+import { CASE_STATUS_OPTIONS, getAllowedNextStages } from "../utils/workflow.js";
 
 export function CaseDetailPage() {
   const navigate = useNavigate();
@@ -34,13 +37,16 @@ export function CaseDetailPage() {
   const { isAdmin } = useAuth();
   const [caseItem, setCaseItem] = useState(null);
   const [client, setClient] = useState(null);
+  const [clients, setClients] = useState([]);
+  const [users, setUsers] = useState([]);
   const [workflow, setWorkflow] = useState({ case_stage: "", case_status: "", case_type: "" });
-  const [assignedUserIds, setAssignedUserIds] = useState("");
+  const [selectedAssignedUserId, setSelectedAssignedUserId] = useState("");
   const [assignedAction, setAssignedAction] = useState("add");
-  const [clientIdInput, setClientIdInput] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingLookups, setIsLoadingLookups] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -58,11 +64,11 @@ export function CaseDetailPage() {
       setCaseItem(data);
       setClient(null);
       setWorkflow({
-        case_stage: data.case_stage || "",
+        case_stage: "",
         case_status: data.case_status || "",
         case_type: data.case_type || "",
       });
-      setClientIdInput(String(clientId || ""));
+      setSelectedClientId(String(clientId || ""));
 
       if (clientId) {
         try {
@@ -83,6 +89,24 @@ export function CaseDetailPage() {
     loadCase();
   }, [caseId]);
 
+  useEffect(() => {
+    async function loadLookups() {
+      setIsLoadingLookups(true);
+
+      try {
+        const [clientsData, usersData] = await Promise.all([listClients(), listUsers()]);
+        setClients(Array.isArray(clientsData) ? clientsData : clientsData.items || []);
+        setUsers(Array.isArray(usersData) ? usersData : usersData.items || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoadingLookups(false);
+      }
+    }
+
+    loadLookups();
+  }, []);
+
   async function handleDelete() {
     setIsDeleting(true);
     setError("");
@@ -101,6 +125,8 @@ export function CaseDetailPage() {
     setWorkflow((current) => ({ ...current, [name]: value }));
   }
 
+  const allowedNextStages = getAllowedNextStages(caseItem?.case_stage);
+
   async function runWorkflowAction(action, successMessage) {
     setIsUpdating(true);
     setError("");
@@ -117,38 +143,31 @@ export function CaseDetailPage() {
     }
   }
 
-  function parseAssignedUserIds() {
-    return assignedUserIds
-      .split(",")
-      .map((id) => Number(id.trim()))
-      .filter((id) => Number.isInteger(id) && id > 0);
-  }
-
   async function handleAssignedUsersSubmit(event) {
     event.preventDefault();
-    const userIds = parseAssignedUserIds();
+    const userId = Number(selectedAssignedUserId);
 
-    if (userIds.length === 0) {
-      setError("Enter at least one assigned user ID.");
+    if (!Number.isInteger(userId) || userId <= 0) {
+      setError("Select a user.");
       return;
     }
 
     await runWorkflowAction(
-      () => updateAssignedUsers(caseId, assignedAction, userIds),
+      () => updateAssignedUsers(caseId, assignedAction, [userId]),
       "Assigned users updated.",
     );
-    setAssignedUserIds("");
+    setSelectedAssignedUserId("");
   }
 
   async function handleClientSubmit(event) {
     event.preventDefault();
 
-    if (!clientIdInput) {
-      setError("Enter a client ID.");
+    if (!selectedClientId) {
+      setError("Select a client email.");
       return;
     }
 
-    await runWorkflowAction(() => reassignCaseClient(caseId, clientIdInput), "Client reassigned.");
+    await runWorkflowAction(() => reassignCaseClient(caseId, selectedClientId), "Client reassigned.");
   }
 
   return (
@@ -237,7 +256,6 @@ export function CaseDetailPage() {
           <section className="content-section workflow-section">
             <div className="section-heading">
               <h2>Workflow actions</h2>
-              <span>Command endpoints</span>
             </div>
             <div className="workflow-grid">
               <form
@@ -251,13 +269,16 @@ export function CaseDetailPage() {
                 }}
               >
                 <label>
-                  <span>Stage</span>
+                  <span>Next stage</span>
                   <select
                     value={workflow.case_stage}
+                    disabled={allowedNextStages.length === 0}
                     onChange={(event) => updateWorkflowField("case_stage", event.target.value)}
                   >
-                    <option value="">Select stage</option>
-                    {STAGE_OPTIONS.map((stage) => (
+                    <option value="">
+                      {allowedNextStages.length === 0 ? "No available transitions" : "Select next stage"}
+                    </option>
+                    {allowedNextStages.map((stage) => (
                       <option key={stage} value={stage}>
                         {stage}
                       </option>
@@ -286,7 +307,7 @@ export function CaseDetailPage() {
                     onChange={(event) => updateWorkflowField("case_status", event.target.value)}
                   >
                     <option value="">Select status</option>
-                    {STATUS_OPTIONS.map((status) => (
+                    {CASE_STATUS_OPTIONS.map((status) => (
                       <option key={status} value={status}>
                         {status}
                       </option>
@@ -319,12 +340,19 @@ export function CaseDetailPage() {
 
               <form className="inline-workflow-form" onSubmit={handleAssignedUsersSubmit}>
                 <label>
-                  <span>Assigned user IDs</span>
-                  <input
-                    placeholder="2, 3"
-                    value={assignedUserIds}
-                    onChange={(event) => setAssignedUserIds(event.target.value)}
-                  />
+                  <span>Assigned user</span>
+                  <select
+                    disabled={isLoadingLookups}
+                    value={selectedAssignedUserId}
+                    onChange={(event) => setSelectedAssignedUserId(event.target.value)}
+                  >
+                    <option value="">{isLoadingLookups ? "Loading users..." : "Select user"}</option>
+                    {users.map((user) => (
+                      <option key={getUserId(user)} value={getUserId(user)}>
+                        {getUserDisplayName(user)}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label>
                   <span>Action</span>
@@ -333,17 +361,28 @@ export function CaseDetailPage() {
                     <option value="delete">delete</option>
                   </select>
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !assignedUserIds} type="submit">
+                <button className="secondary-button" disabled={isUpdating || !selectedAssignedUserId} type="submit">
                   Update users
                 </button>
               </form>
 
               <form className="inline-workflow-form" onSubmit={handleClientSubmit}>
                 <label>
-                  <span>Client ID</span>
-                  <input value={clientIdInput} onChange={(event) => setClientIdInput(event.target.value)} />
+                  <span>Client email</span>
+                  <select
+                    disabled={isLoadingLookups}
+                    value={selectedClientId}
+                    onChange={(event) => setSelectedClientId(event.target.value)}
+                  >
+                    <option value="">{isLoadingLookups ? "Loading clients..." : "Select client email"}</option>
+                    {clients.map((clientItem) => (
+                      <option key={getClientId(clientItem)} value={getClientId(clientItem)}>
+                        {getClientEmail(clientItem) || `${getClientFullName(clientItem)} - no email`}
+                      </option>
+                    ))}
+                  </select>
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !clientIdInput} type="submit">
+                <button className="secondary-button" disabled={isUpdating || !selectedClientId} type="submit">
                   Reassign client
                 </button>
               </form>

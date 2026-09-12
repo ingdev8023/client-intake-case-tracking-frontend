@@ -7,9 +7,7 @@ import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
 import { getCaseClientName, getCaseNumber } from "../utils/display.js";
-
-const STAGE_OPTIONS = ["intake", "document_collection", "review", "filed", "decision"];
-const STATUS_OPTIONS = ["open", "pending", "closed"];
+import { CASE_STAGES, CASE_STATUS_OPTIONS } from "../utils/workflow.js";
 
 export function CasesPage() {
   const [cases, setCases] = useState([]);
@@ -83,7 +81,7 @@ export function CasesPage() {
           <span>Status</span>
           <select value={filters.case_status} onChange={(event) => updateFilter("case_status", event.target.value)}>
             <option value="">Any</option>
-            {STATUS_OPTIONS.map((status) => (
+            {CASE_STATUS_OPTIONS.map((status) => (
               <option key={status} value={status}>
                 {status}
               </option>
@@ -94,7 +92,7 @@ export function CasesPage() {
           <span>Stage</span>
           <select value={filters.case_stage} onChange={(event) => updateFilter("case_stage", event.target.value)}>
             <option value="">Any</option>
-            {STAGE_OPTIONS.map((stage) => (
+            {CASE_STAGES.map((stage) => (
               <option key={stage} value={stage}>
                 {stage}
               </option>
