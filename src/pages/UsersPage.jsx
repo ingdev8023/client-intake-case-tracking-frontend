@@ -5,6 +5,7 @@ import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
 import { getUserIsActive } from "../utils/display.js";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -80,7 +81,6 @@ export function UsersPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Administration"
         title="Users"
         description="Admin-only user management for staff and administrator accounts."
         actions={
@@ -125,7 +125,7 @@ export function UsersPage() {
               <option value="admin">admin</option>
             </select>
           </label>
-          <button className="primary-button" disabled={isSubmitting} type="submit">
+          <button className="login-button" disabled={isSubmitting} type="submit">
             <Plus size={16} />
             {isSubmitting ? "Creating..." : "Create user"}
           </button>
@@ -186,6 +186,7 @@ export function UsersPage() {
           )}
         </section>
       </section>
+      <PageFooter></PageFooter>
     </>
   );
 }

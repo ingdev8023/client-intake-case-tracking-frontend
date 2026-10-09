@@ -2,6 +2,7 @@ import { LogIn } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider.jsx";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -35,46 +36,46 @@ export function LoginPage() {
 
   return (
     <main className="login-page">
-      <section className="login-panel" aria-labelledby="login-title">
-        <div className="login-copy">
-          <span className="brand-mark">CI</span>
-          <h1 id="login-title">Client Intake Case Tracking</h1>
-          <p>Sign in to manage cases, clients, assignments, and workflow updates.</p>
-        </div>
-
-        <form className="form-stack" onSubmit={handleSubmit}>
-          <label>
-            <span>Email</span>
-            <input
-              autoComplete="email"
+      <section className="login-card" aria-labelledby="login-title">
+        <div className="login-brand">
+            <h1 id="login-title">CCT</h1>
+            <p>Client Intake and Case Tracking</p>
+          </div>
+        <form className="login-form" onSubmit={handleSubmit}>  
+          <div className="login-field">
+           <label htmlFor="email">Email</label>
+           <input autoComplete="email"
               name="email"
               onChange={(event) => setEmail(event.target.value)}
               required
               type="email"
               value={email}
-            />
-          </label>
-
-          <label>
-            <span>Password</span>
-            <input
-              autoComplete="current-password"
+              placeholder="name@firm.com"
+              className="login-input"/>
+         </div>
+          
+          <div className="login-field">
+           <label htmlFor="password">Password</label>
+           <input autoComplete="current-password"
               name="password"
               onChange={(event) => setPassword(event.target.value)}
               required
               type="password"
               value={password}
-            />
-          </label>
+              placeholder="***************"
+              className="login-input"
+             />
+         </div>
+         {error && <div className="form-error">{error}</div>}
 
-          {error && <div className="form-error">{error}</div>}
-
-          <button className="primary-button" disabled={isSubmitting} type="submit">
-            <LogIn size={18} />
+          <button className="login-button" disabled={isSubmitting} type="submit">
+            <LogIn size={16} />
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
       </section>
+      <PageFooter></PageFooter>
     </main>
+    
   );
 }

@@ -6,6 +6,8 @@ import { useAuth } from "../auth/AuthProvider.jsx";
 import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
+import { PageFooter } from "../components/PageFooter.jsx";
+import { Link } from "react-router-dom";
 
 export function DashboardPage() {
   const { currentUser } = useAuth();
@@ -58,9 +60,8 @@ export function DashboardPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Overview"
         title={`Welcome${currentUser?.user_name ? `, ${currentUser.user_name}` : ""}`}
-        description="Track active intake work and move cases through the backend workflow."
+        description="Track active intake work"
         actions={
           <button className="secondary-button" onClick={loadDashboard} type="button">
             <RefreshCw size={16} />
@@ -103,7 +104,8 @@ export function DashboardPage() {
               <tbody>
                 {recentCases.map((caseItem) => (
                   <tr key={caseItem.case_id}>
-                    <td>{caseItem.case_title || `Case #${caseItem.case_id}`}</td>
+                    <td><Link className="text-link" to={`/cases/${caseItem.case_id}`}>
+                        {caseItem.case_title || `Case #${caseItem.case_id}`}</Link></td>
                     <td>{caseItem.case_type || "Unassigned"}</td>
                     <td>{caseItem.case_stage || "intake"}</td>
                     <td>
@@ -118,6 +120,7 @@ export function DashboardPage() {
           </div>
         )}
       </section>
+      <PageFooter></PageFooter>
     </>
   );
 }

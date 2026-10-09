@@ -8,6 +8,7 @@ import { PageHeader } from "../components/PageHeader.jsx";
 import { StateBlock } from "../components/StateBlock.jsx";
 import { getClientFullName, getClientId, getUserDisplayName, getUserId } from "../utils/display.js";
 import { CASE_STAGES, CASE_STATUS_OPTIONS } from "../utils/workflow.js";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function NewCasePage() {
   const navigate = useNavigate();
@@ -94,7 +95,6 @@ export function NewCasePage() {
   return (
     <>
       <PageHeader
-        eyebrow="Case management"
         title="Add case"
         description="Create a new case and connect it to an existing client."
         actions={
@@ -180,11 +180,12 @@ export function NewCasePage() {
             )}
           </div>
         </label>
-        <button className="primary-button" disabled={isSubmitting || isLoadingLookups} type="submit">
+        <button className="login-button" disabled={isSubmitting || isLoadingLookups} type="submit">
           <Plus size={16} />
           {isSubmitting ? "Creating..." : "Create case"}
         </button>
       </form>
+      <PageFooter></PageFooter>
     </>
   );
 }

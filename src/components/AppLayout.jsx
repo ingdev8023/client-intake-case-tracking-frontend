@@ -22,10 +22,10 @@ export function AppLayout() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
-          <span className="brand-mark">CI</span>
+          <img className="brand-mark" src="images\DJ_Circuit_Network_Logo_Vector.svg"/>
           <div>
-            <strong>Case Intake</strong>
-            <span>Tracking</span>
+            <strong>Case Intake Tracking</strong>
+            
           </div>
         </div>
 

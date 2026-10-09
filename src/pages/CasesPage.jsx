@@ -8,6 +8,7 @@ import { StateBlock } from "../components/StateBlock.jsx";
 import { StatusBadge } from "../components/StatusBadge.jsx";
 import { getCaseClientName, getCaseNumber } from "../utils/display.js";
 import { CASE_STAGES, CASE_STATUS_OPTIONS } from "../utils/workflow.js";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function CasesPage() {
   const [cases, setCases] = useState([]);
@@ -59,12 +60,11 @@ export function CasesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Case management"
         title="Cases"
         description="Browse active matters and open a case to manage workflow details."
         actions={
           <>
-            <Link className="primary-button" to="/cases/new">
+            <Link className="login-button" to="/cases/new">
               <Plus size={16} />
               Add case
             </Link>
@@ -107,7 +107,7 @@ export function CasesPage() {
           <span>Client ID</span>
           <input value={filters.client_id} onChange={(event) => updateFilter("client_id", event.target.value)} />
         </label>
-        <button className="primary-button" type="submit">
+        <button className="login-button" type="submit">
           <Search size={16} />
           Search
         </button>
@@ -184,6 +184,7 @@ export function CasesPage() {
           </button>
         </div>
       </section>
+      <PageFooter></PageFooter>
     </>
   );
 }

@@ -30,6 +30,7 @@ import {
   getUserId,
 } from "../utils/display.js";
 import { CASE_STATUS_OPTIONS, getAllowedNextStages } from "../utils/workflow.js";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function CaseDetailPage() {
   const navigate = useNavigate();
@@ -173,7 +174,6 @@ export function CaseDetailPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Case detail"
         title={caseItem ? getCaseNumber(caseItem) : `#${caseId}`}
         description="Review the selected case record returned by the API."
         actions={
@@ -285,7 +285,7 @@ export function CaseDetailPage() {
                     ))}
                   </select>
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !workflow.case_stage} type="submit">
+                <button className="login-button" disabled={isUpdating || !workflow.case_stage} type="submit">
                   Update stage
                 </button>
               </form>
@@ -314,7 +314,7 @@ export function CaseDetailPage() {
                     ))}
                   </select>
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !workflow.case_status} type="submit">
+                <button className="login-button" disabled={isUpdating || !workflow.case_status} type="submit">
                   Update status
                 </button>
               </form>
@@ -333,7 +333,7 @@ export function CaseDetailPage() {
                     onChange={(event) => updateWorkflowField("case_type", event.target.value)}
                   />
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !workflow.case_type} type="submit">
+                <button className="login-button" disabled={isUpdating || !workflow.case_type} type="submit">
                   Update type
                 </button>
               </form>
@@ -361,7 +361,7 @@ export function CaseDetailPage() {
                     <option value="delete">delete</option>
                   </select>
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !selectedAssignedUserId} type="submit">
+                <button className="login-button" disabled={isUpdating || !selectedAssignedUserId} type="submit">
                   Update users
                 </button>
               </form>
@@ -382,7 +382,7 @@ export function CaseDetailPage() {
                     ))}
                   </select>
                 </label>
-                <button className="secondary-button" disabled={isUpdating || !selectedClientId} type="submit">
+                <button className="login-button" disabled={isUpdating || !selectedClientId} type="submit">
                   Reassign client
                 </button>
               </form>
@@ -414,6 +414,7 @@ export function CaseDetailPage() {
           </section>
         </div>
       )}
+    <PageFooter></PageFooter>  
     </>
   );
 }

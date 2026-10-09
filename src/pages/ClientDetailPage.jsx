@@ -13,6 +13,7 @@ import {
   getClientLastName,
   getClientPhone,
 } from "../utils/display.js";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function ClientDetailPage() {
   const { clientId } = useParams();
@@ -74,7 +75,6 @@ export function ClientDetailPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Client detail"
         title={getClientFullName(client) || `Client #${clientId}`}
         description="Review and update the selected client profile from the API."
         actions={
@@ -135,12 +135,13 @@ export function ClientDetailPage() {
               onChange={(event) => updateField("client_date_of_birth", event.target.value)}
             />
           </label>
-          <button className="primary-button" disabled={isSaving} type="submit">
+          <button className="login-button" disabled={isSaving} type="submit">
             <Save size={16} />
             {isSaving ? "Saving..." : "Save client"}
           </button>
         </form>
       )}
+      <PageFooter></PageFooter>
     </>
   );
 }

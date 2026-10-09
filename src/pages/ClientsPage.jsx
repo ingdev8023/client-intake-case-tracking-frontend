@@ -11,6 +11,7 @@ import {
   getClientFullName,
   getClientPhone,
 } from "../utils/display.js";
+import { PageFooter } from "../components/PageFooter.jsx";
 
 export function ClientsPage() {
   const [clients, setClients] = useState([]);
@@ -74,7 +75,6 @@ export function ClientsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Client directory"
         title="Clients"
         description="Create client records and keep intake contact data close to case work."
         actions={
@@ -134,7 +134,7 @@ export function ClientsPage() {
               onChange={(event) => updateField("client_date_of_birth", event.target.value)}
             />
           </label>
-          <button className="primary-button" disabled={isSubmitting} type="submit">
+          <button className="login-button" disabled={isSubmitting} type="submit">
             <Plus size={16} />
             {isSubmitting ? "Creating..." : "Create client"}
           </button>
@@ -184,6 +184,7 @@ export function ClientsPage() {
           )}
         </section>
       </section>
+      <PageFooter></PageFooter>
     </>
   );
 }
